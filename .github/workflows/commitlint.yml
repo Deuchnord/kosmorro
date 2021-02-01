@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
@@ -19,6 +21,14 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip comlipy
+    - name: Check number of commits
+      run: |
+        n=$(git rev-list --count ^master HEAD)
+        echo "$n commit(s) in the current branch."
+        if [ $n -gt 1 ]; then
+          echo "Your branch must contain only one commit. Please consider squashing them."
+          exit 1
+        fi
     - name: Lint
       run: |
         message="$(git log --format=%B -n 1 HEAD)"
